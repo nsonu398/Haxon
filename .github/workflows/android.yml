@@ -23,8 +23,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleDebug
     - uses: actions/upload-artifact@v3
       with:
-        name: haxon_debug.apk
-        path: ./app/haxon_release.apk
+        name: apk
+        path: app/build/outputs/apk/debug/app-debug.apk
