@@ -1,40 +1,32 @@
 workflows:
-  native-android:
-    name: Native Android
-    max_build_duration: 120
+  android-debug-workflow:
+    name: Android Debug Workflow
     instance_type: mac_mini_m1
+    max_build_duration: 60
     environment:
-      android_signing:
-        - keystore_reference
-      groups:
-        - google_play
       vars:
-        PACKAGE_NAME: "io.codemagic.androidquicksample"
+        # You can define environment variables here, if needed.
+      android:
+        # Specify the Android version if necessary; otherwise, the default will be used.
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+          source: true
     scripts:
-      - name: Set Android SDK location
+      - name: Install dependencies
         script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
-      - name: Build Android release
+          echo "Installing dependencies..."
+          cd android && ./gradlew dependencies
+      - name: Run debug build
         script: |
-          LATEST_GOOGLE_PLAY_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME")
-          if [ -z LATEST_BUILD_NUMBER ]; then
-              # fallback in case no build number was found from google play. Alternatively, you can `exit 1` to fail the build
-              UPDATED_BUILD_NUMBER=$BUILD_NUMBER
-          else
-              UPDATED_BUILD_NUMBER=$(($LATEST_GOOGLE_PLAY_BUILD_NUMBER + 1))
-          fi
-          ./gradlew bundleRelease -PversionCode=$UPDATED_BUILD_NUMBER -PversionName=1.0.$UPDATED_BUILD_NUMBER
+          echo "Building the app..."
+          cd android && ./gradlew assembleDebug
     artifacts:
-      - app/build/outputs/**/*.aab
+      - android/app/build/outputs/**/*.apk
     publishing:
       email:
         recipients:
-          - user_1@example.com
-          - user_2@example.com
-        notify:
-          success: true
-          failure: false
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-        submit_as_draft: true
+          - your_email@example.com # Replace with your email
