@@ -5,9 +5,7 @@ workflows:
     max_build_duration: 60
     environment:
       vars:
-        # You can define environment variables here, if needed.
-      android:
-        # Specify the Android version if necessary; otherwise, the default will be used.
+        # Environment variables can be defined here if needed.
     triggering:
       events:
         - push
